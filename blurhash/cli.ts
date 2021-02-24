@@ -14,20 +14,16 @@ tkt
         desc: "Image URL",
         demand: true,
       },
-      width: {
-        type: "number",
-        demand: true,
-      },
-      height: {
-        type: "number",
-        demand: true,
-      },
     },
     async (args) => {
-      const { url, width, height } = args;
+      const { url } = args;
       const input = (await axios({ url: url, responseType: "arraybuffer" }))
         .data as Buffer;
-      const buffer = await sharp(input)
+      const s = sharp(input);
+      const metadata = await s.metadata();
+      let width = metadata.width!;
+      let height = metadata.height!;
+      const buffer = await s
         .raw()
         .ensureAlpha()
         .resize(width, height, { fit: "inside" })
